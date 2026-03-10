@@ -2,7 +2,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.routers import users
 from app.DBConnection.DB import async_engine
-from app.Models.user import Base
+from app.Models.base import Base
+from app.Models.user import User  # noqa: F401 - Register model with Base.metadata
+from app.Models.category import Category  # noqa: F401 - Register model with Base.metadata
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

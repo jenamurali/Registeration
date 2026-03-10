@@ -1,10 +1,9 @@
 from typing import Optional
-from sqlalchemy import String, Integer, Boolean
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, Integer, Boolean, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic import BaseModel, EmailStr
-
-class Base(DeclarativeBase): 
-    pass
+from app.Models.base import Base
+from app.Models.category import CategoryResponse
 
 # SQLAlchemy Model
 class User(Base):
@@ -17,7 +16,10 @@ class User(Base):
     company_name: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255), unique=True)
     mobile_no: Mapped[str] = mapped_column(String(20))
-    category_id: Mapped[int] = mapped_column(Integer)  # FK -> Categories table
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.category_id"))  # FK -> Categories table
+
+    # Relationship to Category
+    category: Mapped["Category"] = relationship(back_populates="users")
     payment_status: Mapped[bool] = mapped_column(Boolean, default=False)  # Paid/Unpaid
     payment_method: Mapped[str] = mapped_column(String(50))  # Cash, CC, Net Banking, etc.
     receipt_no: Mapped[str] = mapped_column(String(100))
@@ -60,6 +62,7 @@ class UserResponse(BaseModel):
     email: str
     mobile_no: str
     category_id: int
+    category: Optional[CategoryResponse] = None
     payment_status: bool
     payment_method: str
     receipt_no: str

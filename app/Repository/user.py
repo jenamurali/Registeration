@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Type
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.Models.user import User, UserCreate, UserUpdate
 
 ModelType = TypeVar("ModelType", bound=User)
@@ -18,11 +19,15 @@ class AbstractRepository(Generic[ModelType, CreateSchemaType]):
         return db_obj
 
     async def get_by_id(self, id: int) -> ModelType | None:
-        result = await self.session.execute(select(self.model).filter_by(reg_id=id))
+        result = await self.session.execute(
+            select(self.model).filter_by(reg_id=id).options(selectinload(User.category))
+        )
         return result.scalars().first()
 
     async def get_all(self) -> list[ModelType]:
-        result = await self.session.execute(select(self.model))
+        result = await self.session.execute(
+            select(self.model).options(selectinload(User.category))
+        )
         return result.scalars().all()
 
     async def update(self, db_obj: ModelType) -> ModelType:

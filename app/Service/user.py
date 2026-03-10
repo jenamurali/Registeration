@@ -14,6 +14,11 @@ class UserService:
             
             # Execute database insertion
             user = await self.uow.users.create(user_data)
+
+            # Flush to generate the reg_id, then re-fetch with category eagerly loaded
+            # so the response can be serialized after the session closes
+            await self.uow.session.flush()
+            user = await self.uow.users.get_by_id(user.reg_id)
             
             # Transaction commits automatically as we exit the `async with` block safely
             return user
@@ -30,6 +35,9 @@ class UserService:
                 setattr(user, field, value)
 
             user = await self.uow.users.update(user)
+            # Re-fetch with category eagerly loaded for response serialization
+            await self.uow.session.flush()
+            user = await self.uow.users.get_by_id(user.reg_id)
             # Transaction commits automatically as we exit the `async with` block safely
             return user
     
