@@ -24,8 +24,11 @@ class UserService:
             if not user:
                 raise HTTPException(status_code=404, detail="User not found")
             
-            # Update user data
-            user.name = user_data.name
+            # Update only provided fields (partial update)
+            update_data = user_data.model_dump(exclude_unset=True)
+            for field, value in update_data.items():
+                setattr(user, field, value)
+
             user = await self.uow.users.update(user)
             # Transaction commits automatically as we exit the `async with` block safely
             return user

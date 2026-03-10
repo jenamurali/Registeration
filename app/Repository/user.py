@@ -1,7 +1,6 @@
 from typing import Generic, TypeVar, Type
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from uuid import UUID
 from app.Models.user import User, UserCreate, UserUpdate
 
 ModelType = TypeVar("ModelType", bound=User)
@@ -18,8 +17,8 @@ class AbstractRepository(Generic[ModelType, CreateSchemaType]):
         self.session.add(db_obj)
         return db_obj
 
-    async def get_by_id(self, id: UUID) -> ModelType | None:
-        result = await self.session.execute(select(self.model).filter_by(id=id))
+    async def get_by_id(self, id: int) -> ModelType | None:
+        result = await self.session.execute(select(self.model).filter_by(reg_id=id))
         return result.scalars().first()
 
     async def get_all(self) -> list[ModelType]:
@@ -30,8 +29,8 @@ class AbstractRepository(Generic[ModelType, CreateSchemaType]):
         merged = await self.session.merge(db_obj)
         return merged
 
-    async def delete(self, id: UUID) -> None:
-        result = await self.session.execute(select(self.model).filter_by(id=id))
+    async def delete(self, id: int) -> None:
+        result = await self.session.execute(select(self.model).filter_by(reg_id=id))
         db_obj = result.scalars().first()
         if db_obj:
             await self.session.delete(db_obj)
