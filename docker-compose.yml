@@ -33,6 +33,14 @@ services:
       db:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - web
+
 volumes:
   # This makes your database data persist even if the container stops
   db_data:

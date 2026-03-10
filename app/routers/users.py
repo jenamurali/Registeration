@@ -19,8 +19,8 @@ async def create_user(user: UserCreate, user_service: UserService = Depends(get_
     return await user_service.create_user(user)
 
 @router.get("/", response_model=list[UserResponse])
-async def read_users(user_service: UserService = Depends(get_user_service)):
-    return await user_service.get_all_users()
+async def read_users(skip: int = 0, limit: int = 100, user_service: UserService = Depends(get_user_service)):
+    return await user_service.get_all_users(skip=skip, limit=limit)
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def read_user(user_id: int, user_service: UserService = Depends(get_user_service)):

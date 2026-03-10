@@ -24,9 +24,9 @@ class AbstractRepository(Generic[ModelType, CreateSchemaType]):
         )
         return result.scalars().first()
 
-    async def get_all(self) -> list[ModelType]:
+    async def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelType]:
         result = await self.session.execute(
-            select(self.model).options(selectinload(User.category))
+            select(self.model).options(selectinload(User.category)).offset(skip).limit(limit)
         )
         return result.scalars().all()
 

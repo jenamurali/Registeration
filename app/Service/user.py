@@ -52,9 +52,9 @@ class UserService:
             
             # Transaction commits automatically as we exit the `async with` block safely
     
-    async def get_all_users(self) -> List[User]:
+    async def get_all_users(self, skip: int = 0, limit: int = 100) -> List[User]:
         async with self.uow:
-            users = await self.uow.users.get_all()
+            users = await self.uow.users.get_all(skip=skip, limit=limit)
             return users
 
     async def get_user_by_id(self, user_id: int) -> User:
